@@ -28,7 +28,7 @@ under the License.
     </parent>
 
     <artifactId>rya.spark</artifactId>
-    <name>Apache Rya MapReduce Tools</name>
+    <name>Apache Rya Spark Support</name>
 
     <dependencies>
 	    <dependency>
@@ -39,7 +39,7 @@ under the License.
 	    <dependency>
 		    <groupId>org.apache.spark</groupId>
 		    <artifactId>spark-core_2.11</artifactId>
-		    <version>1.2.2</version>
+		    <version>1.6.2</version>
 		</dependency>
         <dependency>
             <groupId>org.apache.rya</groupId>

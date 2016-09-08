@@ -75,9 +75,9 @@ public class GraphXEdgeInputFormatTest {
     }
 
     @SuppressWarnings("rawtypes")
-	@Test
+    @Test
     public void testInputFormat() throws Exception {
-    	RyaStatement input = RyaStatement.builder()
+        RyaStatement input = RyaStatement.builder()
             .setSubject(new RyaURI("http://www.google.com"))
             .setPredicate(new RyaURI("http://some_other_uri"))
             .setObject(new RyaURI("http://www.yahoo.com"))
@@ -119,7 +119,7 @@ public class GraphXEdgeInputFormatTest {
             Edge writable = (Edge) ryaStatementRecordReader.getCurrentValue();
             long srcId = writable.srcId();
             long destId = writable.dstId();
-			RyaTypeWritable rtw = null;
+            RyaTypeWritable rtw = null;
             Object text = ryaStatementRecordReader.getCurrentKey();
             Edge<RyaTypeWritable> edge = new Edge<RyaTypeWritable>(srcId, destId, rtw);
             results.add(edge);
