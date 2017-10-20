@@ -18,6 +18,8 @@
  */
 package org.apache.rya.mongodb.document.visibility;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.apache.rya.mongodb.MongoDbRdfConstants;
 import org.apache.rya.mongodb.dao.SimpleMongoDBStorageStrategy;
@@ -113,6 +115,8 @@ public final class DocumentVisibilityAdapter {
                 documentVisibilityArray = (Object[]) documentVisibilityObject;
             } else if (documentVisibilityObject instanceof BasicDBList) {
                 documentVisibilityArray = DocumentVisibilityUtil.convertBasicDBListToObjectArray((BasicDBList) documentVisibilityObject);
+            } else if (documentVisibilityObject instanceof ArrayList) {
+                documentVisibilityArray = DocumentVisibilityUtil.convertListToObjectArray((ArrayList<?>) documentVisibilityObject);
             }
 
             final String documentVisibilityString = DocumentVisibilityUtil.multidimensionalArrayToBooleanString(documentVisibilityArray);

@@ -328,4 +328,22 @@ public final class DocumentVisibilityUtil {
         }
         return list.toArray(new Object[0]);
     }
+
+    /**
+     * Converts a {@link List} into an array of {@link Object}s.
+     * @param basicDbList the {@link List} to convert.
+     * @return the array of {@link Object}s.
+     */
+    public static Object[] convertListToObjectArray(final List<?> inputList) {
+        final List<Object> list = new ArrayList<>();
+        final Object[] array = inputList.toArray();
+        for (final Object child : array) {
+            if (child instanceof List) {
+                list.add(convertListToObjectArray((List<?>)child));
+            } else {
+                list.add(child);
+            }
+        }
+        return list.toArray(new Object[0]);
+    }
 }

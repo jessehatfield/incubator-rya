@@ -192,4 +192,43 @@ public class RyaSailFactory {
             LOG.info("Instance does not have a rya details collection, skipping.");
         }
     }
+
+    /**
+     * Create an initialize a {@link RyaDAO} given a {@link Configuration} object.
+     * @param conf Configuration for either Accumulo or MongoDB Rya.
+     * @return An initialized DAO.
+     * @throws RyaDAOException
+     */
+    public static RyaDAO<?> getRyaDAO(Configuration config) throws RyaDAOException {
+        RdfCloudTripleStoreConfiguration rdfConfig;
+        RyaDAO<?> dao;
+        final String ryaInstance = config.get(RdfCloudTripleStoreConfiguration.CONF_TBL_PREFIX);
+        Objects.requireNonNull(ryaInstance, "RyaInstance or table prefix is missing from configuration: "+RdfCloudTripleStoreConfiguration.CONF_TBL_PREFIX);
+        if(ConfigUtils.getUseMongo(config)) {
+            final MongoDBRdfConfiguration mongoConfig = new MongoDBRdfConfiguration(config);
+            rdfConfig = mongoConfig;
+            final MongoClient client = MongoConnectorFactory.getMongoClient(config);
+            try {
+                final MongoRyaInstanceDetailsRepository ryaDetailsRepo = new MongoRyaInstanceDetailsRepository(client, mongoConfig.getCollectionName());
+                RyaDetailsToConfiguration.addRyaDetailsToConfiguration(ryaDetailsRepo.getRyaInstanceDetails(), mongoConfig);
+            } catch (final RyaDetailsRepositoryException e) {
+               LOG.info("Instance does not have a rya details collection, skipping.");
+           }
+            dao = getMongoDAO((MongoDBRdfConfiguration)rdfConfig, client);
+        } else {
+            rdfConfig = new AccumuloRdfConfiguration(config);
+            String user = rdfConfig.get(ConfigUtils.CLOUDBASE_USER);
+            String pswd = rdfConfig.get(ConfigUtils.CLOUDBASE_PASSWORD);
+            Objects.requireNonNull(user, "Accumulo user name is missing from configuration: "+ConfigUtils.CLOUDBASE_USER);
+            Objects.requireNonNull(pswd, "Accumulo user password is missing from configuration: "+ConfigUtils.CLOUDBASE_PASSWORD);
+            rdfConfig.setTableLayoutStrategy( new TablePrefixLayoutStrategy(ryaInstance) );
+            try {
+                updateAccumuloConfig((AccumuloRdfConfiguration) rdfConfig, user, pswd, ryaInstance);
+                dao = getAccumuloDAO((AccumuloRdfConfiguration)rdfConfig);
+            } catch (AccumuloException | AccumuloSecurityException e) {
+                throw new RyaDAOException("Couldn't instantiate RyaDAO from the provided configuration", e);
+            }
+        }
+        return dao;
+    }
 }
